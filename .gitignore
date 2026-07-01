@@ -1,0 +1,32 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+env/
+.env
+
+# Telethon Sessions
+*.session
+*.session-journal
+
+# App Data & Config
+config.json
+downloads/
+cache_media/
+logs/
+not_sent/
+test_video/
+test_run/
+*.csv
+
+# OS Files
+.DS_Store
+Thumbs.db
+*.log
+cli_output*.txt
+debug*.txt
+
+# IDE
+.vscode/
+.idea/
