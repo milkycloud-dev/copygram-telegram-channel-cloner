@@ -1,0 +1,60 @@
+name: Build Releases
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [windows-latest, ubuntu-latest]
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: Install Dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install pyinstaller
+
+    - name: Build with PyInstaller (Windows)
+      if: matrix.os == 'windows-latest'
+      run: |
+        pyinstaller --noconfirm --onedir --windowed --icon "assets/icon.png" --name "Copygram" "main_flet.py"
+
+    - name: Build with PyInstaller (Linux)
+      if: matrix.os == 'ubuntu-latest'
+      run: |
+        pyinstaller --noconfirm --onedir --windowed --name "Copygram" "main_flet.py"
+
+    - name: Zip Windows Release
+      if: matrix.os == 'windows-latest'
+      run: Compress-Archive -Path "dist/Copygram" -DestinationPath "Copygram_Windows.zip"
+
+    - name: Tar Linux Release
+      if: matrix.os == 'ubuntu-latest'
+      run: tar -czf Copygram_Linux.tar.gz -C dist "Copygram"
+
+    - name: Upload Release Assets
+      uses: softprops/action-gh-release@v1
+      if: startsWith(github.ref, 'refs/tags/')
+      with:
+        files: |
+          Copygram_Windows.zip
+          Copygram_Linux.tar.gz

@@ -1,0 +1,6 @@
+Telethon
+flet==0.22.1
+qrcode
+pillow
+rich
+imageio-ffmpeg
