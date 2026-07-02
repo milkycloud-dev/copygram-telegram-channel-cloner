@@ -789,11 +789,39 @@ class CopierCore:
                             )
                         )
                     elif len(media_files) > 1:
-                        # Альбомы не могут содержать кружочки и войсы
-                        files = [m["path"] for m in media_files]
-                        sent_msg = await watchdog_upload(
-                            self.bot.send_file(dest_bot, files, caption=text_caption, progress_callback=upload_progress, reply_to=reply_to)
-                        )
+                        # Альбомы: загружаем каждый файл с правильными атрибутами
+                        uploaded_files = []
+                        for m in media_files:
+                            uploaded_files.append({
+                                "file": m["path"],
+                                "attributes": m["attributes"] if m["attributes"] else None,
+                            })
+                        
+                        # Отправляем альбом, передавая атрибуты для каждого файла
+                        # Telethon поддерживает список файлов, но не per-file атрибуты,
+                        # поэтому загружаем по одному файлу, если есть атрибуты
+                        has_attrs = any(uf["attributes"] for uf in uploaded_files)
+                        if has_attrs:
+                            # Отправляем по одному файлу с правильными атрибутами
+                            sent_msgs = []
+                            for idx, uf in enumerate(uploaded_files):
+                                cap = text_caption if idx == 0 else None
+                                s = await watchdog_upload(
+                                    self.bot.send_file(
+                                        dest_bot, uf["file"],
+                                        caption=cap,
+                                        attributes=uf["attributes"],
+                                        progress_callback=upload_progress,
+                                        reply_to=reply_to
+                                    )
+                                )
+                                sent_msgs.append(s)
+                            sent_msg = sent_msgs[0]
+                        else:
+                            files = [m["path"] for m in media_files]
+                            sent_msg = await watchdog_upload(
+                                self.bot.send_file(dest_bot, files, caption=text_caption, progress_callback=upload_progress, reply_to=reply_to)
+                            )
                     else:
                         sent_msg = await self.bot.send_message(dest_bot, text_caption, reply_to=reply_to)
                         

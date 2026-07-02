@@ -1,6 +1,7 @@
 import os
 import shutil
 import random
+import struct
 import subprocess
 from i18n import t
 
@@ -17,8 +18,16 @@ except ImportError:
 
 def append_random_bytes(filepath: str) -> str:
     """
-    Safely appends random garbage bytes to the end of a file to modify its hash.
-    This effectively bypasses duplicate detection in Telegram.
+    Appends data to the end of a file to modify its hash, bypassing
+    Telegram duplicate detection.
+    
+    For MP4/MOV/M4V/M4A files, appends a valid 'free' atom (an empty
+    padding box defined by the ISO BMFF spec). All MP4 parsers,
+    including Telethon's internal prober, will simply skip it,
+    keeping the container perfectly valid.
+    
+    For all other formats, appends raw random bytes (harmless for
+    non-box-structured containers).
     
     Args:
         filepath (str): The absolute or relative path to the target file.
@@ -27,8 +36,18 @@ def append_random_bytes(filepath: str) -> str:
         str: The path to the modified file.
     """
     try:
+        ext = os.path.splitext(filepath)[1].lower()
         with open(filepath, "ab") as f:
-            f.write(os.urandom(random.randint(16, 128)))
+            if ext in ('.mp4', '.mov', '.m4v', '.m4a'):
+                # Write a valid ISO BMFF 'free' atom:
+                #   4 bytes — atom size (big-endian uint32)
+                #   4 bytes — atom type ('free')
+                #   N bytes — random padding data
+                padding = os.urandom(random.randint(16, 128))
+                atom_size = 8 + len(padding)
+                f.write(struct.pack('>I', atom_size) + b'free' + padding)
+            else:
+                f.write(os.urandom(random.randint(16, 128)))
         return filepath
     except Exception as e:
         print(t('hash_mod_err', str(e)))
@@ -85,8 +104,9 @@ def clean_file(filepath: str) -> tuple:
         return final_path, t('pillow_success', filename), "success"
     
     # 2. Clean video/audio via FFmpeg (limited to 1 thread for low RAM usage)
-    # Skip FFmpeg for MP4/MOV to preserve rotation matrices and exact stream structures.
-    # The fallback (byte appending) is 100% safe and effective for hash changing.
+    # Skip FFmpeg for MP4/MOV to preserve rotation matrices, stream structure,
+    # and moov atom layout. Instead, we append a valid 'free' atom (see step 3)
+    # which safely changes the hash without touching the container.
     if ext not in ('.mp4', '.mov'):
         try:
             import uuid
@@ -142,14 +162,16 @@ def clean_file(filepath: str) -> tuple:
         except Exception as e:
             pass
         
-    # 3. Fallback (just alter the hash)
+    # 3. Direct hash alteration (primary method for MP4/MOV)
+    # For MP4/MOV this is the INTENDED path, not a fallback.
+    # append_random_bytes uses a valid 'free' atom for these formats.
     try:
         if os.path.exists(out_path):
             os.remove(out_path)
-        out_path_fallback = filepath + "_cleaned_fallback" + ext
-        shutil.copyfile(filepath, out_path_fallback)
-        os.remove(filepath)
-        final_path = append_random_bytes(out_path_fallback)
-        return final_path, t('fallback_success', filename), "warning"
+        final_path = append_random_bytes(filepath)
+        is_video_direct = ext in ('.mp4', '.mov')
+        status = "success" if is_video_direct else "warning"
+        msg = t('ffmpeg_success', filename) if is_video_direct else t('fallback_success', filename)
+        return final_path, msg, status
     except Exception:
         return filepath, t('process_err', filename), "error"

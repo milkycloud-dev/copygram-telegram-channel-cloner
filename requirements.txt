@@ -4,3 +4,4 @@ qrcode
 pillow
 rich
 imageio-ffmpeg
+hachoir
