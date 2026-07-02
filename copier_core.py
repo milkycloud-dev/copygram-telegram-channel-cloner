@@ -13,7 +13,7 @@ from telethon.tl.functions.channels import CreateChannelRequest, EditAdminReques
 from telethon.tl.functions.messages import GetForumTopicsRequest, CreateForumTopicRequest
 from telethon.tl.types import InputChatUploadedPhoto, DocumentAttributeVideo, DocumentAttributeAudio, ChatAdminRights
 
-from metadata_cleaner import clean_file
+from metadata_cleaner import clean_file, generate_thumbnail
 
 import csv
 
@@ -723,13 +723,21 @@ class CopierCore:
             
             # Определение атрибутов для видео (в т.ч. кружочков) и аудио (в т.ч. голоса)
             attributes = []
+            is_video = False
             if hasattr(msg.media, 'document'):
                 for attr in msg.media.document.attributes:
                     if isinstance(attr, DocumentAttributeVideo):
                         attributes.append(attr)
+                        is_video = True
                     elif isinstance(attr, DocumentAttributeAudio):
                         attributes.append(attr)
-            return {"path": cleaned_path, "attributes": attributes}
+            
+            # Генерация миниатюры для видео (превью в Telegram)
+            thumb_path = None
+            if is_video:
+                thumb_path = await asyncio.to_thread(generate_thumbnail, cleaned_path)
+            
+            return {"path": cleaned_path, "attributes": attributes, "thumb": thumb_path}
             
         tasks = [process_media_item(m, i+1) for i, m in enumerate(messages)]
         results = await asyncio.gather(*tasks)
@@ -784,17 +792,19 @@ class CopierCore:
                                 m["path"], 
                                 caption=text_caption, 
                                 attributes=m["attributes"] if m["attributes"] else None,
+                                thumb=m.get("thumb"),
                                 progress_callback=upload_progress,
                                 reply_to=reply_to
                             )
                         )
                     elif len(media_files) > 1:
-                        # Альбомы: загружаем каждый файл с правильными атрибутами
+                        # Альбомы: загружаем каждый файл с правильными атрибутами и превью
                         uploaded_files = []
                         for m in media_files:
                             uploaded_files.append({
                                 "file": m["path"],
                                 "attributes": m["attributes"] if m["attributes"] else None,
+                                "thumb": m.get("thumb")
                             })
                         
                         # Отправляем альбом, передавая атрибуты для каждого файла
@@ -811,6 +821,7 @@ class CopierCore:
                                         dest_bot, uf["file"],
                                         caption=cap,
                                         attributes=uf["attributes"],
+                                        thumb=uf.get("thumb"),
                                         progress_callback=upload_progress,
                                         reply_to=reply_to
                                     )
@@ -819,8 +830,9 @@ class CopierCore:
                             sent_msg = sent_msgs[0]
                         else:
                             files = [m["path"] for m in media_files]
+                            thumbs = [m.get("thumb") for m in media_files]
                             sent_msg = await watchdog_upload(
-                                self.bot.send_file(dest_bot, files, caption=text_caption, progress_callback=upload_progress, reply_to=reply_to)
+                                self.bot.send_file(dest_bot, files, caption=text_caption, thumb=thumbs, progress_callback=upload_progress, reply_to=reply_to)
                             )
                     else:
                         sent_msg = await self.bot.send_message(dest_bot, text_caption, reply_to=reply_to)
@@ -869,10 +881,14 @@ class CopierCore:
             try:
                 if status_text == "Success":
                     os.remove(m["path"])
+                    if m.get("thumb") and os.path.exists(m["thumb"]):
+                        os.remove(m["thumb"])
                 elif status_text == "Failed":
                     filename = os.path.basename(m["path"])
                     shutil.move(m["path"], os.path.join(NOT_SENT_DIR, filename))
                     self._emit("on_log", {"level": "WARN", "msg": f"Медиа {filename} сохранено в not_sent/"})
+                    if m.get("thumb") and os.path.exists(m["thumb"]):
+                        os.remove(m["thumb"])
             except: pass
             
         if status_text == "Success" and media_files:
