@@ -724,18 +724,20 @@ class CopierCore:
             # Определение атрибутов для видео (в т.ч. кружочков) и аудио (в т.ч. голоса)
             attributes = []
             is_video = False
+            video_duration = 0
             if hasattr(msg.media, 'document'):
                 for attr in msg.media.document.attributes:
                     if isinstance(attr, DocumentAttributeVideo):
                         attributes.append(attr)
                         is_video = True
+                        video_duration = attr.duration
                     elif isinstance(attr, DocumentAttributeAudio):
                         attributes.append(attr)
             
             # Генерация миниатюры для видео (превью в Telegram)
             thumb_path = None
             if is_video:
-                thumb_path = await asyncio.to_thread(generate_thumbnail, cleaned_path)
+                thumb_path = await asyncio.to_thread(generate_thumbnail, cleaned_path, video_duration)
             
             return {"path": cleaned_path, "attributes": attributes, "thumb": thumb_path}
             

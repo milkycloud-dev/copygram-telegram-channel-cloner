@@ -177,28 +177,33 @@ def clean_file(filepath: str) -> tuple:
         return filepath, t('process_err', filename), "error"
 
 
-def generate_thumbnail(video_path: str) -> str | None:
+def generate_thumbnail(video_path: str, duration: int = 0) -> str | None:
     """
-    Extracts a single frame from a video at ~1 second mark and saves it as
-    a JPEG thumbnail. This is used to provide Telegram with a preview image
-    during upload, preventing the "no preview / white flash" issue.
-    
-    Args:
-        video_path (str): Path to the video file.
-        
-    Returns:
-        str | None: Path to the generated thumbnail JPEG, or None on failure.
+    Extracts a single frame from a video and saves it as a JPEG thumbnail.
+    If duration is provided, it extracts from the middle of the video.
+    Otherwise it extracts from the 1-second mark.
     """
     thumb_path = video_path + "_thumb.jpg"
+    
+    # Calculate seek time
+    seek_time = "00:00:01"
+    if duration and duration > 3:
+        # Seek to the middle of the video
+        mid = int(duration / 2)
+        h = mid // 3600
+        m = (mid % 3600) // 60
+        s = mid % 60
+        seek_time = f"{h:02d}:{m:02d}:{s:02d}"
+
     try:
         cmd = [
             FFMPEG_PATH,
             "-y",
+            "-ss", seek_time,        # put -ss before -i for fast seeking
             "-i", video_path,
-            "-ss", "00:00:01",       # seek to 1 second
             "-vframes", "1",         # extract 1 frame
-            "-q:v", "5",             # JPEG quality (lower = better, 2-5 is good)
-            "-vf", "scale='min(320,iw)':-1",  # max 320px wide, keep aspect ratio
+            "-q:v", "5",             # JPEG quality
+            "-vf", "scale='min(320,iw)':-1",  # max 320px wide
             thumb_path
         ]
         result = subprocess.run(
