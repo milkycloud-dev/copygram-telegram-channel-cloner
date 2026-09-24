@@ -3,7 +3,7 @@
 
   # Copygram
 
-  **The ultimate solution for cloning and mirroring Telegram channels to your own.**
+  **Clone and mirror Telegram channels into your own.**
 
   [Русская версия ниже](#русская-версия)
 
@@ -13,12 +13,12 @@
 
 ## English Version
 
-**Copygram** is a powerful automation tool designed to clone, mirror, and seamlessly transfer posts, media, and comments from any source Telegram channel directly into **your own target channel**. Built on Telethon, it acts as a bridge between channels, replicating content while intelligently bypassing Telegram's forwarding protections.
+**Copygram** clones posts, media and comments from a source Telegram channel into **your own target channel**. It is built on Telethon and copies the feed even where Telegram forbids forwarding.
 
 ### Key Features
-- **Direct Channel-to-Channel Mirroring**: Don't just download — completely clone the feed from a source channel into your own destination channel automatically.
+- **Direct Channel-to-Channel Mirroring**: copies the whole feed of a source channel into your own channel instead of only downloading it.
 - **Bypass Protected Content**: Successfully copies and re-uploads media from "Save Restricted" channels straight to your channel.
-- **Smart Metadata Cleaning**: Uses FFmpeg and Pillow to dynamically modify media hashes (MP4, MOV, GIF, JPG, PNG, OGG). The algorithm safely repackages containers without corruption, effectively bypassing Telegram's duplicate file detection and allowing seamless uploads.
+- **Smart Metadata Cleaning**: Uses FFmpeg and Pillow to modify media hashes (MP4, MOV, GIF, JPG, PNG, OGG). Containers are repackaged without corruption, so Telegram's duplicate file detection does not block the uploads.
 - **Multi-Session Support**: Keep your accounts safe by using separate sessions. A "Reader" account monitors the source channel, while a "Creator" account (admin in your target channel) publishes the posts.
 - **Dual Interface**: Run in full GUI mode (powered by Flet) for an intuitive visual experience, or CLI mode for headless server environments.
 - **Multi-language Support**: Real-time switching between English, Russian, and other localizations.
@@ -41,7 +41,7 @@
 
 ## Русская версия
 
-**Copygram** — это мощный инструмент для автоматического клонирования и зеркалирования Telegram-каналов. Программа не просто скачивает файлы, а **напрямую переносит посты, медиа и комментарии из канала-источника в ваш собственный канал**. Построенный на базе Telethon, Copygram работает как мост, бережно воссоздавая ленту в вашем целевом канале и обходя любые ограничения на пересылку.
+**Copygram** клонирует Telegram-каналы. Программа не только скачивает файлы, но и **переносит посты, медиа и комментарии из канала-источника в ваш собственный канал**. Работает на Telethon и копирует ленту даже там, где пересылка запрещена.
 
 ### Основные возможности
 - **Прямое зеркалирование каналов**: Полное клонирование ленты источника и автоматическая публикация контента в вашем канале.
