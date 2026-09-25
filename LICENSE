@@ -1,38 +1,58 @@
-Copyright (c) 2026 MilkyCloud. All Rights Reserved.
+Proprietary License
 
-PROPRIETARY SOFTWARE LICENSE
+Copyright (c) 2026 milkycloud-dev. All rights reserved.
 
-This software and associated documentation files (the "Software") are the
-exclusive property of the copyright holder. All rights are reserved.
+This repository and everything in it, including source code, compiled
+binaries, documentation, images and configuration files (the "Software"),
+is the property of the copyright holder and is protected by copyright law.
 
-PERMISSIONS
------------
-You are granted a limited, non-exclusive, non-transferable right to:
-  - View and study the source code for personal, non-commercial purposes.
-  - Use the Software for your own personal, non-commercial use only.
+1. Reservation of rights
 
-RESTRICTIONS
-------------
-Without the prior written permission of the copyright holder, you may NOT:
-  - Copy, reproduce, or duplicate the Software or any portion thereof.
-  - Distribute, publish, or make the Software publicly available.
-  - Modify, adapt, translate, or create derivative works based on the Software.
-  - Sublicense, sell, rent, lease, transfer, assign, or otherwise dispose of
-    the Software.
-  - Use the Software for commercial purposes of any kind.
-  - Remove or alter any proprietary notices, labels, or marks on the Software.
-  - Use the name, branding, or logo of the Software without permission.
+   No license is granted except as stated in section 2. Without prior written
+   permission of the copyright holder you may not copy, modify, merge,
+   translate, decompile, disassemble, create derivative works of, publish,
+   distribute, sublicense, rent, lend, sell or otherwise make the Software or
+   any part of it available to third parties, in source or binary form.
 
-NO WARRANTY
------------
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE, AND NON-INFRINGEMENT. IN NO EVENT SHALL THE
-COPYRIGHT HOLDER BE LIABLE FOR ANY CLAIM, DAMAGES, OR OTHER LIABILITY, WHETHER
-IN AN ACTION OF CONTRACT, TORT, OR OTHERWISE, ARISING FROM, OUT OF, OR IN
-CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+2. Permitted use
 
-CONTACT
--------
-To request permission for any use not covered by this license, please open an
-issue or contact the repository owner directly via GitHub.
+   You may download the official release binaries published in the Releases
+   section of this repository and run them, unmodified, on servers and
+   computers that you operate. This permission is personal, non-exclusive,
+   non-transferable and revocable. It does not include the right to
+   redistribute the binaries, to bundle them into modpacks, server packs or
+   other distributions, or to host them for download elsewhere.
+
+3. Source code
+
+   The source code is published for reference only. Viewing it on GitHub, and
+   forking it inside GitHub to the extent required by the GitHub Terms of
+   Service, does not grant any right to use, copy, build or modify it outside
+   of section 2.
+
+4. Third-party components
+
+   Minecraft, Mojang, NeoForge, Paper, WorldEdit, WorldGuard and all other
+   third-party names and trademarks belong to their respective owners.
+   Third-party libraries bundled with the Software remain under their own
+   licenses. Where such a license grants you rights for that component, for
+   example the right to modify an LGPL library and to reverse engineer the
+   Software for debugging such modifications, those rights apply to that
+   component and are not limited by this license.
+
+5. No warranty
+
+   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+   COPYRIGHT HOLDER BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF
+   OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+   SOFTWARE.
+
+6. Termination
+
+   Any use of the Software outside these terms ends the permission granted in
+   section 2 automatically and without notice.
+
+To ask for permissions beyond this license, open an issue in this repository.
